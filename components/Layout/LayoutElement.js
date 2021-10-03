@@ -2,16 +2,11 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   height:100%;
-  padding: 24px;
+  padding: 30px;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto; 
+  grid-template-rows: auto auto auto 1fr auto auto; 
   color: ${(props) => { return props.checked ? '#E9EAEC' : null; }};;
-  background-color: ${(props) => { return props.checked ? '#0F1624' : null; }};;
-`;
-
-export const Div = styled.div`
-  height: 100%;
-  width: 100%;
+  background-color: ${(props) => { return props.checked ? '#0F1624' : '#F8F8F8'; }};;
 `;
 
 export const Header = styled.div`
@@ -26,7 +21,7 @@ export const Header = styled.div`
 `;
 
 export const Main = styled.div`
-  
+  min-height: 100vh;
 `;
 
 export const Toggle = styled.input`

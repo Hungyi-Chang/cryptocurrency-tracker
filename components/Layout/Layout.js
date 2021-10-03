@@ -3,14 +3,16 @@ import Image from 'next/image';
 
 import bitcoin from '../../public/image/bitcoin.png';
 import PaginationComponent from '../PaginationComponent/PagenationComponent';
+import SearchInput from '../SearchInput/SearchInput';
 import {
-  Container, Main, Footer, Header, Toggle, Ball, Label, Div,
+  Container, Main, Footer, Header, Toggle, Ball, Label,
 } from './LayoutElement';
+
 // import Logo from '../../public/image/Logo.png';
 
 const Layout = ({ children, checked, setDarkMode }) => {
   return (
-    <Div checked={checked}>
+    <>
       <Container checked={checked}>
         <Header>
           <div style={{
@@ -27,12 +29,12 @@ const Layout = ({ children, checked, setDarkMode }) => {
           <i style={{ color: '#f39c12' }} className="fas fa-sun" />
           <Ball checked={checked} />
         </Label>
-
+        <SearchInput placeholder="Filter by coin name" />
         <Main>{children}</Main>
         <PaginationComponent checked={checked} />
         <Footer>Copyright &copy; cryptocurrency tracker</Footer>
       </Container>
-    </Div>
+    </>
   );
 };
 

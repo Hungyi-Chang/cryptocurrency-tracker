@@ -1,6 +1,7 @@
+/* eslint-disable max-len */
 import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
 import { formatCoinName } from '../../utils/formatTools';
+import CoinTable from '../../components/CoinTable/CoinTable';
 
 const CoinList = ({ coinList }) => {
   const [coinData, setCoinData] = useState([]);
@@ -61,31 +62,7 @@ const CoinList = ({ coinList }) => {
   }, [isBrowser, preData, coinData]);
   return (
     <>
-      <ul>
-        {coinData.length > 0 && coinData.map((data) => {
-          return (
-            <li key={data.symbol}>
-              <div style={{
-                position: 'relative', width: '30px', height: '30px', margin: '5px',
-              }}
-              >
-                <Image alt="Mountains" src={`${data.image}`} layout="fill" objectFit="cover" />
-              </div>
-              {/* {formatCoinName(data.s)} */}
-
-              {data.symbol.toUpperCase()}
-              <span style={{ color: `${data.current_price > data.last_price ? 'green'
-               : data.current_price === data.last_price || !data.last_price? '': 'red'}` , transition: 'color 0.3s ease-out' }}>
-                : $
-                {' '}
-                {Number(data.current_price).toFixed(3)}
-              </span>
-
-            </li>
-          );
-        })}
-      </ul>
-
+      <CoinTable coinData={coinData} />
     </>
   );
 };
@@ -122,3 +99,18 @@ export const getStaticProps = async ({ params }) => {
 };
 
 export default CoinList;
+
+// {/* <ul>
+//   {coinData.length > 0 && coinData.map((data) => {
+//     return (
+//       <li key={data.symbol}>
+
+//         {/* {formatCoinName(data.s)} */}
+
+//         {data.symbol.toUpperCase()}
+//         : $
+
+//       </li>
+//     );
+//   })}
+// </ul> */}
