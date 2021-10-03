@@ -1,22 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { formatCoinName } from '../../utils/formatTools';
 
 const CoinList = ({ coinList }) => {
   const [coinData, setCoinData] = useState([]);
   const [preData, setPreData] = useState(false);
+  const ws = useRef(null);
   const isBrowser = typeof window !== 'undefined';
 
   useEffect(() => {
+    ws.current = new WebSocket('wss://stream.binance.com:9443/ws');
+
     if (coinList) {
       setCoinData(coinList);
       setPreData(true);
     }
+    return () => {
+      setCoinData(undefined);
+      ws.current.close(1000, 'unknown');
+    };
   }, [coinList]);
 
   useEffect(() => {
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws');
-    if (isBrowser && preData) {
+    if (isBrowser && preData && ws.current !== null) {
       // setWsInstance(ws);
       const msg = {
         method: 'SUBSCRIBE',
@@ -27,11 +33,11 @@ const CoinList = ({ coinList }) => {
         id: 1,
       };
       const jsonMsg = JSON.stringify(msg);
-      ws.onopen = () => {
+      ws.current.onopen = () => {
         // console.log('[open] Connection established');
-        ws.send(jsonMsg);
+        ws.current.send(jsonMsg);
       };
-      ws.onmessage = (event) => {
+      ws.current.onmessage = (event) => {
         const coinObject = JSON.parse(event.data);
         if (Array.isArray(coinObject)) {
           const filteredCoinData = coinObject.filter((cur) => {
@@ -43,6 +49,7 @@ const CoinList = ({ coinList }) => {
               (cur) => { return coinDataCopy[i].symbol.toUpperCase() === formatCoinName(cur.s); },
             );
             if (coinIndex >= 0) {
+              coinDataCopy[i].last_price = coinDataCopy[i].current_price;
               coinDataCopy[i].current_price = filteredCoinData[coinIndex].c;
             }
           }
@@ -51,25 +58,13 @@ const CoinList = ({ coinList }) => {
         }
       };
     }
-    return () => {
-      ws.onclose = (event) => {
-        if (event.wasClean) {
-          // eslint-disable-next-line max-len
-          // console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-        } else {
-          // e.g. server process killed or network down
-          // event.code is usually 1006 in this case
-          // console.log('[close] Connection died');
-        }
-      };
-    };
   }, [isBrowser, preData, coinData]);
   return (
     <>
       <ul>
         {coinData.length > 0 && coinData.map((data) => {
           return (
-            <li>
+            <li key={data.symbol}>
               <div style={{
                 position: 'relative', width: '30px', height: '30px', margin: '5px',
               }}
@@ -77,11 +72,15 @@ const CoinList = ({ coinList }) => {
                 <Image alt="Mountains" src={`${data.image}`} layout="fill" objectFit="cover" />
               </div>
               {/* {formatCoinName(data.s)} */}
-              {data.symbol.toUpperCase()}
-              : $
-              {' '}
 
-              {Number(data.current_price).toFixed(3)}
+              {data.symbol.toUpperCase()}
+              <span style={{ color: `${data.current_price > data.last_price ? 'green'
+               : data.current_price === data.last_price || !data.last_price? '': 'red'}` , transition: 'color 0.3s ease-out' }}>
+                : $
+                {' '}
+                {Number(data.current_price).toFixed(3)}
+              </span>
+
             </li>
           );
         })}

@@ -1,4 +1,5 @@
 import Stack from '@mui/material/Stack';
+import Link from 'next/link'
 import PaginationItem from '@mui/material/PaginationItem';
 import { StyledPagination } from './PaginationElement';
 
@@ -13,10 +14,13 @@ const PaginationComponent = ({checked}) => {
         color="primary"
         renderItem={(item) => {
           return (
-            <PaginationItem
-              {...item}
-              sx={{ fontSize: 14, color:`${checked? '#fff': 'black'}`} }
-            />
+            <Link href={`/coinList/${item.page}`}>
+              <PaginationItem
+                {...item}
+                sx={{ fontSize: 14, color: `${checked ? '#fff' : 'black'}` }}
+              />
+            </Link>
+            
           );
         }}
       />
